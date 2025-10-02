@@ -1,6 +1,6 @@
 package com.randu.pengembalian.vo;
 
-import java.util.Date;
+import java.sql.Date;
 
 public class Peminjaman {
 

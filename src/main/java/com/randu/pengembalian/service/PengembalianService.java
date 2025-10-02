@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.randu.pengembalian.model.Pengembalian;
 import com.randu.pengembalian.repository.PengembalianRepository;
 import com.randu.pengembalian.vo.Peminjaman;
+import com.randu.pengembalian.vo.Buku;
+import com.randu.pengembalian.vo.Anggota;
 import com.randu.pengembalian.vo.ResponseTemplate;
 import org.springframework.web.client.RestTemplate;
 
@@ -49,6 +51,20 @@ public class PengembalianService {
         Peminjaman peminjaman = restTemplate.getForObject(
                 "http://localhost:8003/api/peminjaman/" + pengembalian.getPeminjamanId(),
                 Peminjaman.class);
+
+        Buku buku = null;
+        Anggota anggota = null;
+        if (peminjaman != null) {
+            // Panggil service buku menggunakan bukuId yang ada di entitas peminjaman
+            buku = restTemplate.getForObject(
+                    "http://localhost:8001/api/buku/" + peminjaman.getBukuId(),
+                    Buku.class);
+
+            // Panggil service anggota menggunakan anggotaId yang ada di entitas peminjaman
+            anggota = restTemplate.getForObject(
+                    "http://localhost:8002/api/anggota/" + peminjaman.getAnggotaId(),
+                    Anggota.class);
+        }
         // Jika peminjaman tidak ditemukan, kembalikan VO dengan hanya pengembalian
         if (peminjaman == null) {
             ResponseTemplate vo = new ResponseTemplate(pengembalian, null);
@@ -56,7 +72,11 @@ public class PengembalianService {
             return responseList;
         }
 
-        ResponseTemplate vo = new ResponseTemplate(pengembalian, peminjaman);
+        ResponseTemplate vo = new ResponseTemplate();
+        vo.setPengembalian(pengembalian);
+        vo.setPeminjaman(peminjaman);
+        vo.setBuku(buku);
+        vo.setAnggota(anggota);
         responseList.add(vo);
         return responseList;
     }
