@@ -11,7 +11,7 @@ public class ResponseTemplate {
     public ResponseTemplate() {
     }
 
-    public ResponseTemplate(Pengembalian pengembalian, Peminjaman peminjaman) {
+    public ResponseTemplate(Pengembalian pengembalian, Peminjaman peminjaman, Buku buku, Anggota anggota) {
         this.pengembalian = pengembalian;
         this.peminjaman = peminjaman;
         this.buku = buku;

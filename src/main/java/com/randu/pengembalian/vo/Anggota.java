@@ -6,6 +6,7 @@ public class Anggota {
     private String nama;
     private String alamat;
     private String jenis_kelamin;
+    private String email;
 
     public Anggota() {
     }
@@ -49,11 +50,19 @@ public class Anggota {
     public void setJenis_kelamin(String jenis_kelamin) {
         this.jenis_kelamin = jenis_kelamin;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
     
     @Override
     public String toString() {
-        // TODO Auto-generated method stub
-        return super.toString();
+        return "Anggota [id=" + id + ", nim=" + nim + ", nama=" + nama + ", alamat=" + alamat + ", jenis_kelamin="
+                + jenis_kelamin + ", email=" + email + "]";
     }
     
 }

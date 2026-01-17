@@ -20,6 +20,9 @@ public class PengembalianService {
     @Autowired
     private PengembalianRepository pengembalianRepository;
 
+    @Autowired
+    private org.springframework.amqp.rabbit.core.RabbitTemplate rabbitTemplate;
+
     public List<Pengembalian> gettAllPengembalians(){
         return pengembalianRepository.findAll();
     }
@@ -29,7 +32,19 @@ public class PengembalianService {
     }
 
     public Pengembalian createPengembalian(Pengembalian pengembalian){
-        return pengembalianRepository.save(pengembalian);
+        Pengembalian savedPengembalian = pengembalianRepository.save(pengembalian);
+        
+        // Notify via RabbitMQ
+        try {
+            String exchange = "notification.exchange";
+            String routingKey = "notification.key";
+            String message = "Pengembalian Baru: Transaksi Peminjaman ID " + savedPengembalian.getPeminjamanId() + " telah dikembalikan.";
+            rabbitTemplate.convertAndSend(exchange, routingKey, message);
+        } catch (Exception e) {
+            System.err.println("Gagal mengirim notifikasi RabbitMQ: " + e.getMessage());
+        }
+        
+        return savedPengembalian;
     }
 
     public void deletePengembalian(Long id){
@@ -67,7 +82,9 @@ public class PengembalianService {
         }
         // Jika peminjaman tidak ditemukan, kembalikan VO dengan hanya pengembalian
         if (peminjaman == null) {
-            ResponseTemplate vo = new ResponseTemplate(pengembalian, null);
+            ResponseTemplate vo = new ResponseTemplate();
+            vo.setPengembalian(pengembalian);
+            vo.setPeminjaman(null);
             responseList.add(vo);
             return responseList;
         }
